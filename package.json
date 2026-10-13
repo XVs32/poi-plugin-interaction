@@ -1,0 +1,12 @@
+{
+  "name": "poi-plugin-blank",
+  "version": "0.1.0",
+  "description": "A minimal blank plugin for the POI browser.",
+  "main": "index.es",
+  "author": "",
+  "license": "MIT",
+  "keywords": [
+    "poi",
+    "poi-plugin"
+  ]
+}
