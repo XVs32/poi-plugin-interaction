@@ -1,12 +1,27 @@
 {
-  "name": "poi-plugin-blank",
-  "version": "0.1.0",
-  "description": "A minimal blank plugin for the POI browser.",
-  "main": "index.es",
-  "author": "",
-  "license": "MIT",
-  "keywords": [
-    "poi",
-    "poi-plugin"
-  ]
+    "name": "poi-plugin-forwarder",
+    "version": "1.1.0",
+    "description": "Forward intercepted game API data to custom port",
+    "main": "index.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/XVs32/poi-plugin-interaction.git"
+    },
+    "bugs": {
+        "url": "https://github.com/XVs32/poi-plugin-interaction/issues"
+    },
+    "keywords": [
+        "poi-plugin"
+    ],
+    "license": "Apache-2.0",
+    "author": {
+        "name": "XVs32",
+        "link": "https://github.com/XVs32"
+    },
+    "poiPlugin": {
+        "name": "API Forwarder",
+        "description": "Automatically intercept and forward game API data",
+        "icon": "fa/share-square",
+        "priority": 99
+    }
 }
