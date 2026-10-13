@@ -18,23 +18,23 @@ class InteractionServer {
 
     start() {
         if (this.server) return this.server
-        const server = net.createServer(socket => this._accept(socket))
-        this.server = server
-        this.status = `starting on 127.0.0.1:${this.port}`
-        server.on('error', error => {
-            console.error(`[API Forwarder] interaction server error: ${error.message}`)
-            if (this.server === server) {
-                this.status = `error: ${error.code || error.message}`
-            }
-        })
-        server.listen(this.port, '127.0.0.1', () => {
-            const port = server.address().port
-            if (this.server === server) {
-                this.status = `listening on 127.0.0.1:${port}`
-            }
-            console.log(`[API Forwarder] interaction service listening on 127.0.0.1:${port}`)
-        })
-        return server
+            const server = net.createServer(socket => this._accept(socket))
+            this.server = server
+            this.status = `starting on 127.0.0.1:${this.port}`
+            server.on('error', error => {
+                console.error(`[API Forwarder] interaction server error: ${error.message}`)
+                if (this.server === server) {
+                    this.status = `error: ${error.code || error.message}`
+                }
+            })
+            server.listen(this.port, '127.0.0.1', () => {
+                const port = server.address().port
+                if (this.server === server) {
+                    this.status = `listening on 127.0.0.1:${port}`
+                }
+                console.log(`[API Forwarder] interaction service listening on 127.0.0.1:${port}`)
+            })
+            return server
     }
 
     stop() {
@@ -62,82 +62,82 @@ class InteractionServer {
 
     _accept(socket) {
         if (this.client) this.client.destroy()
-        this.client = socket
-        socket.setNoDelay(true)
+            this.client = socket
+            socket.setNoDelay(true)
 
-        const decoder = new PacketDecoder((type, payload) => {
-            if (type !== JSON_PACKET) throw new Error('Commands must use JSON packets')
-            const command = JSON.parse(payload.toString('utf8'))
-            this._handleCommand(socket, command).catch(error => {
-                this._sendError(socket, command.id, error)
+            const decoder = new PacketDecoder((type, payload) => {
+                if (type !== JSON_PACKET) throw new Error('Commands must use JSON packets')
+                    const command = JSON.parse(payload.toString('utf8'))
+                    this._handleCommand(socket, command).catch(error => {
+                        this._sendError(socket, command.id, error)
+                    })
             })
-        })
 
-        socket.on('data', chunk => {
-            try {
-                decoder.push(chunk)
-            } catch (error) {
-                this._sendError(socket, 0, error)
-                socket.destroy()
-            }
-        })
-        socket.on('close', () => {
-            if (this.client === socket) this.client = null
-        })
-        socket.on('error', () => { })
+            socket.on('data', chunk => {
+                try {
+                    decoder.push(chunk)
+                } catch (error) {
+                    this._sendError(socket, 0, error)
+                    socket.destroy()
+                }
+            })
+            socket.on('close', () => {
+                if (this.client === socket) this.client = null
+            })
+            socket.on('error', () => { })
     }
 
     async _handleCommand(socket, command) {
         const id = Number(command.id)
         if (!Number.isInteger(id) || id < 1) throw new Error('Invalid request id')
 
-        switch (command.type) {
-        case 'hello':
-            this._sendJson(socket, {
-                id,
-                type: 'hello',
-                protocol: 1,
-                capabilities: [
-                    'capture', 'click', 'hover', 'scroll', 'drag', 'refresh', 'quest_stats'
-                ]
-            })
-            break
-        case 'ping':
-            this._sendJson(socket, { id, type: 'pong' })
-            break
-        case 'capture':
-            await this._capture(socket, id)
-            break
-        case 'click':
-            this._click(command.x, command.y)
-            this._sendJson(socket, { id, type: 'ok' })
-            break
-        case 'hover':
-            this._hover(command.x, command.y)
-            this._sendJson(socket, { id, type: 'ok' })
-            break
-        case 'scroll':
-            this._scroll(command.x, command.y, command.deltaY)
-            this._sendJson(socket, { id, type: 'ok' })
-            break
-        case 'drag':
-            await this._drag(command.startX, command.startY, command.endX, command.endY)
-            this._sendJson(socket, { id, type: 'ok' })
-            break
-        case 'refresh':
-            this._getWebContents().reload()
-            this._sendJson(socket, { id, type: 'ok' })
-            break
-        case 'quest_stats':
-            this._sendJson(socket, {
-                id,
-                type: 'quest_stats',
-                data: this._getQuestStats()
-            })
-            break
-        default:
-            throw new Error(`Unknown command: ${command.type}`)
-        }
+            switch (command.type) {
+                case 'hello':
+                    this._sendJson(socket, {
+                        id,
+                        type: 'hello',
+                        protocol: 1,
+                        capabilities: [
+                            'capture', 'click', 'hover', 'scroll', 'drag', 'refresh', 'quest_stats'
+                        ]
+                    })
+                    break
+                case 'ping':
+                    this._sendJson(socket, { id, type: 'pong' })
+                    break
+                case 'capture':
+                    await this._capture(socket, id)
+                    break
+                case 'click':
+                    this._click(command.x, command.y)
+                    this._sendJson(socket, { id, type: 'ok' })
+                    break
+                case 'hover':
+                    this._hover(command.x, command.y)
+                    this._sendJson(socket, { id, type: 'ok' })
+                    break
+                case 'scroll':
+                    this._scroll(command.x, command.y, command.deltaY)
+                    this._sendJson(socket, { id, type: 'ok' })
+                    break
+                case 'drag':
+                    await this._drag(command.startX, command.startY, command.endX, command.endY)
+                    this._sendJson(socket, { id, type: 'ok' })
+                    break
+                case 'refresh':
+                    this._getWebContents().reload()
+                    this._sendJson(socket, { id, type: 'ok' })
+                    break
+                case 'quest_stats':
+                    this._sendJson(socket, {
+                        id,
+                        type: 'quest_stats',
+                        data: this._getQuestStats()
+                    })
+                    break
+                default:
+                    throw new Error(`Unknown command: ${command.type}`)
+            }
     }
 
     async _capture(socket, requestId) {
@@ -228,13 +228,13 @@ class InteractionServer {
     _getViewRef() {
         const viewRef = window.getStore('layout.webview.ref')
         if (!viewRef) throw new Error('The KanColle webview is not ready')
-        return viewRef
+            return viewRef
     }
 
     _getWebContents() {
         const webContents = this._getViewRef().getWebContents()
         if (!webContents) throw new Error('The KanColle web contents are not ready')
-        return webContents
+            return webContents
     }
 
     _getQuestStats() {
@@ -250,8 +250,8 @@ class InteractionServer {
         if (!socket.destroyed) {
             this._sendJson(socket, {
                 id: Number(requestId) || 0,
-                type: 'error',
-                message: error.message || String(error)
+                           type: 'error',
+                           message: error.message || String(error)
             })
         }
     }
