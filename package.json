@@ -1,6 +1,6 @@
 {
   "name": "poi-plugin-interaction",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Screenshot and input service for KanColle",
   "main": "index.js",
   "repository": {
