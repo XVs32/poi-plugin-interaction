@@ -310,7 +310,7 @@ class InteractionServer {
             x: point.x,
             y: point.y,
             deltaX: 0,
-            deltaY: Number(deltaY)
+            deltaY: -Number(deltaY)
         })
 
         await this._randomDelay(60, 180)
